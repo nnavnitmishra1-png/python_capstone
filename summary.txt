@@ -1,0 +1,159 @@
+ANALYSIS OF FACTORS ASSOCIATED WITH DIABETES STATUS - RESULTS SUMMARY
+======================================================================
+
+1. DATA CLEANING LOG
+Raw data: 70,692 rows x 22 columns, 0 missing cells, 1,635 duplicate rows.
+Missing cells handled: 0
+Duplicate rows removed: 1,635
+Out-of-range rows removed: 0
+BMI IQR fences: [13.0, 45.0] -> 2,181 outliers flagged (kept; winsorised to [19.0, 52.0] for modelling).
+Clean data: 69,057 rows x 34 columns, memory 11.87 MB -> 10.45 MB.
+
+2. KEY FINDINGS (descriptive)
+ - Sample is balanced by design (50.8% diabetic), so rates below are relative to a 50% baseline.
+ - Diabetic share rises with age: 8.0% (18-24) vs 70-74 peak at 64.2%.
+ - Poor self-rated health: 78.8% vs excellent health: 14.9%.
+ - Lowest income band: 66.0% vs highest band: 36.5%.
+ - Obese II+ respondents: 72.7% vs normal BMI: 28.4%.
+ - High blood pressure: 66.9% vs no high blood pressure: 29.4%.
+ - High BP + high cholesterol + obese profile (14,673 people): 80.1% vs 42.9% for everyone else.
+
+3. DESCRIPTIVE STATISTICS
+             count    mean     std   min   25%   50%   75%   max   skew  kurtosis
+BMI        69057.0  29.956   7.148  12.0  25.0  29.0  33.0  98.0  1.706     7.098
+MentHlth   69057.0   3.840   8.231   0.0   0.0   0.0   3.0  30.0  2.348     4.289
+PhysHlth   69057.0   5.945  10.139   0.0   0.0   0.0   6.0  30.0  1.622     1.059
+Age        69057.0   8.604   2.858   1.0   7.0   9.0  11.0  13.0 -0.557    -0.202
+Education  69057.0   4.900   1.029   1.0   4.0   5.0   6.0   6.0 -0.659    -0.064
+Income     69057.0   5.651   2.176   1.0   4.0   6.0   8.0   8.0 -0.618    -0.777
+GenHlth    69057.0   2.864   1.108   1.0   2.0   3.0   4.0   5.0  0.156    -0.640
+
+4. NORMALITY OF BMI (Shapiro-Wilk, 5000-row sample per group)
+                group      W  p_value  skewness
+Diabetic/Pre-diabetic 0.9047      0.0    1.5206
+         Non-diabetic 0.9023      0.0    2.2080
+Interpretation: p < 0.05 and positive skew -> BMI is not normal -> Mann-Whitney U is the primary test.
+
+5. DIABETIC vs NON-DIABETIC: CONTINUOUS VARIABLES
+variable                 BMI  MentHlth  PhysHlth
+median_diabetic      31.0000    0.0000    1.0000
+median_non_diabetic  27.0000    0.0000    0.0000
+mean_diabetic        31.9642    4.4934    8.0085
+mean_non_diabetic    27.8802    3.1649    3.8130
+mannwhitney_p         0.0000    0.0000    0.0000
+welch_t              78.5372   21.3427   55.8466
+welch_p               0.0000    0.0000    0.0000
+cohens_d              0.5962    0.1619    0.4229
+rank_biserial_r       0.3684    0.0455    0.2171
+
+Kruskal-Wallis (BMI across general-health levels): H = 5525.2, p = 0
+
+6. CHI-SQUARE TESTS (sorted by effect size, Bonferroni corrected)
+                            chi2  dof  p_value  cramers_v effect_size  crude_odds_ratio  p_bonferroni  significant_0.05
+variable                                                                                                               
+GenHlth               11355.5693    4      0.0     0.4055      medium               NaN           0.0              True
+HighBP                 9557.3231    1      0.0     0.3720      medium            4.8724           0.0              True
+Age                    5950.1989   12      0.0     0.2935       small               NaN           0.0              True
+HighChol               5467.1781    1      0.0     0.2814       small            3.1869           0.0              True
+DiffWalk               4924.7961    1      0.0     0.2670       small            3.6730           0.0              True
+Income                 3347.7424    7      0.0     0.2202       small               NaN           0.0              True
+HeartDiseaseorAttack   2964.4036    1      0.0     0.2072       small            3.5328           0.0              True
+Education              1790.2500    5      0.0     0.1610       small               NaN           0.0              True
+PhysActivity           1558.9596    1      0.0     0.1502       small            0.5148           0.0              True
+Stroke                 1039.1216    1      0.0     0.1227       small            2.9912           0.0              True
+CholCheck               974.7561    1      0.0     0.1188       small            6.6788           0.0              True
+HvyAlcoholConsump       671.8886    1      0.0     0.0986  negligible            0.3552           0.0              True
+Smoker                  397.0324    1      0.0     0.0758  negligible            1.3556           0.0              True
+Veggies                 359.4434    1      0.0     0.0721  negligible            0.7024           0.0              True
+Fruits                  136.9357    1      0.0     0.0445  negligible            0.8331           0.0              True
+Sex                     124.7874    1      0.0     0.0425  negligible            1.1864           0.0              True
+NoDocbcCost              89.9751    1      0.0     0.0361  negligible            1.2797           0.0              True
+AnyHealthcare            50.2123    1      0.0     0.0270  negligible            1.2952           0.0              True
+Interpretation: with a large n most p-values are tiny, so judge importance by Cramer's V.
+
+7. LOGISTIC REGRESSION (adjusted odds ratios)
+                          OR  CI_low  CI_high  p_value
+CholCheck             3.9079  3.3341   4.5805   0.0000
+HighBP                2.0289  1.9515   2.1095   0.0000
+HighChol              1.7800  1.7150   1.8475   0.0000
+GenHlth               1.7633  1.7240   1.8034   0.0000
+BMI_per5              1.5110  1.4871   1.5352   0.0000
+Sex                   1.3050  1.2566   1.3553   0.0000
+HeartDiseaseorAttack  1.2930  1.2228   1.3673   0.0000
+Stroke                1.1865  1.0951   1.2854   0.0000
+Age                   1.1656  1.1566   1.1746   0.0000
+DiffWalk              1.1163  1.0611   1.1744   0.0000
+AnyHealthcare         1.0574  0.9643   1.1595   0.2354
+NoDocbcCost           1.0181  0.9524   1.0883   0.5983
+MentHlth              0.9956  0.9931   0.9981   0.0006
+PhysHlth              0.9924  0.9900   0.9947   0.0000
+Smoker                0.9916  0.9554   1.0291   0.6554
+PhysActivity          0.9771  0.9371   1.0187   0.2761
+Fruits                0.9766  0.9397   1.0150   0.2293
+Education             0.9679  0.9487   0.9875   0.0014
+Veggies               0.9439  0.9017   0.9881   0.0133
+Income                0.9438  0.9343   0.9535   0.0000
+HvyAlcoholConsump     0.4726  0.4295   0.5199   0.0000
+
+Strongest risk-associated factors : CholCheck, HighBP, HighChol, GenHlth
+Strongest protective-associated   : HvyAlcoholConsump, Income, Veggies, Education
+CAUTION: CholCheck (cholesterol checked in last 5 years) is probably a DETECTION effect - people with diabetes see doctors more - not a biological risk factor. HvyAlcoholConsump < 1 is a well-known survey artefact (sick-quitter effect), NOT proof that alcohol protects. Odds ratios near 1 with CI crossing 1 are not significant.
+Pseudo R2 (McFadden) = 0.255 | test AUC = 0.817 | sensitivity = 0.760 | specificity = 0.716 (threshold = 0.508)
+
+Multicollinearity (VIF):
+             feature  VIF
+             GenHlth 1.86
+            PhysHlth 1.69
+            DiffWalk 1.58
+              Income 1.52
+              HighBP 1.35
+                 Age 1.34
+           Education 1.31
+            MentHlth 1.26
+HeartDiseaseorAttack 1.19
+            BMI_per5 1.19
+            HighChol 1.17
+        PhysActivity 1.16
+         NoDocbcCost 1.14
+             Veggies 1.10
+              Fruits 1.10
+       AnyHealthcare 1.09
+              Stroke 1.09
+                 Sex 1.09
+              Smoker 1.08
+           CholCheck 1.03
+   HvyAlcoholConsump 1.02
+Rule of thumb: VIF < 5 -> acceptable.
+
+8. SENSITIVITY ANALYSIS: duplicates kept vs removed
+                      OR_with_duplicates  OR_deduplicated  abs_difference  same_direction
+HighBP                            2.0554           2.0289          0.0264            True
+GenHlth                           1.7864           1.7633          0.0232            True
+CholCheck                         3.8901           3.9079          0.0178            True
+HighChol                          1.7963           1.7800          0.0163            True
+BMI_per5                          1.5200           1.5110          0.0090            True
+Smoker                            1.0004           0.9916          0.0088           False
+Fruits                            0.9682           0.9766          0.0084            True
+DiffWalk                          1.1081           1.1163          0.0083            True
+PhysActivity                      0.9731           0.9771          0.0039            True
+AnyHealthcare                     1.0535           1.0574          0.0039            True
+Education                         0.9648           0.9679          0.0031            True
+HeartDiseaseorAttack              1.2900           1.2930          0.0030            True
+Veggies                           0.9410           0.9439          0.0028            True
+Age                               1.1682           1.1656          0.0026            True
+HvyAlcoholConsump                 0.4749           0.4726          0.0024            True
+Sex                               1.3072           1.3050          0.0023            True
+Stroke                            1.1846           1.1865          0.0019            True
+Income                            0.9422           0.9438          0.0016            True
+NoDocbcCost                       1.0195           1.0181          0.0015            True
+PhysHlth                          0.9920           0.9924          0.0004            True
+MentHlth                          0.9956           0.9956          0.0000            True
+
+9. LIMITATIONS
+ - Cross-sectional survey: results show ASSOCIATION, not causation.
+ - Self-reported data (recall / social-desirability bias).
+ - Target merges pre-diabetes and diabetes.
+ - The sample is artificially balanced 50/50: group percentages are NOT population prevalence;
+   use odds ratios / relative differences, and note predictive accuracy is on a balanced sample.
+ - Statistical significance is inflated by the large sample size -> effect sizes reported.
+ - Forecasting is not applicable: the data have no time dimension.
